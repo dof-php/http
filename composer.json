@@ -1,0 +1,36 @@
+{
+    "name": "dof-php/http",
+    "description": "HTTP server side development",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "dof-php",
+            "email": "me@dof.php"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "dof-php/framework": "dev-master",
+        "dof-php/ddd": "dev-master"
+    },
+    "require-dev": {
+        "dof-php/testing": "dev-master"
+    },
+ 	"autoload": {
+		"psr-4": {
+			"DOF\\HTTP\\": "./src/"
+		},
+		"files": [
+		],
+		"exclude-from-classmap": [
+       ]
+    },
+    "autoload-dev": {
+		"psr-4": {
+			"DOF\\HTTP\\Test\\": "./test/"
+		}
+    },
+	"minimum-stability": "dev",
+    "prefer-stable": true
+}

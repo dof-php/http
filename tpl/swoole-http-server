@@ -1,0 +1,109 @@
+#!/usr/bin/env php
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+ini_set('log_errors', 'php.errors');
+
+const DOFS_SWOOLE_VERSION = '4.5.2';
+const DOFS_HTTP_SERVER = 'DOFSHttpServer';
+const DOFS_HTTP_MANAGER = 'DOFSHttpManager';
+const DOFS_HTTP_WORKER = 'DOFSHttpWorker';
+
+$version = phpversion('swoole');
+if (false === $version) {
+    exit('SwooleNotFound');
+}
+if (0 !== version_compare($version, DOFS_SWOOLE_VERSION)) {
+    exit('InvalidSwooleVersion');
+}
+
+$load = function ($_root, bool $__root = false) use (&$root, &$argv) {
+    if ($root && \is_string($root) &&\is_dir($root)) {
+        $_root = $root = \realpath($root);
+        if ($__root) {
+            unset($argv[1], $argv[2]);
+            $argv = \array_values($argv);
+        }
+    }
+    $loader = \join(DIRECTORY_SEPARATOR, [$_root, 'vendor', 'autoload.php']);
+    if (\is_file($loader)) {
+        $root = $_root;
+        return $loader;
+    }
+    return false;
+};
+
+$root = (($argv[1] ?? '') === '--set-root') ? ($argv[2] ?? null) : null;
+
+$loader = ($load($root, true) ?: ($load(getcwd()) ?: $load(__DIR__)));
+if ((! $loader) || (!\is_file($loader))) {
+    exit('ComposerAutoloaderNotFound');
+}
+
+$env = [];
+$cfg = \join(DIRECTORY_SEPARATOR, [$root, 'config', 'env.php']);
+if (\is_file($cfg)) {
+    $env = include_once $cfg;
+}
+
+$addr = $env['DOFS_HTTP_LISTEN_ADDR'] ?? '0.0.0.0';
+$port = $env['DOFS_HTTP_LISTEN_PORT'] ?? 9501;
+$daemon = $env['DOFS_HTTP_DAEMONIZE'] ?? false;
+$worker = $env['DOFS_HTTP_WORKER_NUM'] ?? 1;
+$log = $env['DOFS_HTTP_SERVER_LOG'] ?? null;
+
+$http = new Swoole\Http\Server($addr, $port);
+
+$http->on('start', function ($server) {
+    cli_set_process_title(DOFS_HTTP_SERVER);
+    // swoole_set_process_name(DOFS_HTTP_SERVER);
+});
+
+$http->on('managerStart', function ($server) {
+    cli_set_process_title(DOFS_HTTP_MANAGER);
+    // swoole_set_process_name(DOFS_HTTP_MANAGER);
+});
+
+$http->on('workerStart', function ($server) use ($loader, $root) {
+    cli_set_process_title(DOFS_HTTP_WORKER);
+    // swoole_set_process_name(DOFS_HTTP_WORKER);
+
+    try {
+        require_once $loader;
+
+        DOF\Kernel::init('swoole');
+        DOF\Kernel::boot($root);
+    } catch (Throwable | Swoole\ExitException $th) {
+        echo $th, PHP_EOL;
+
+        $server->stop();
+        $server->shutdown();
+    }
+});
+
+$http->on('request', function ($request, $response) {
+    try {
+        $kernel = (new DOF\HTTP\Swoole($request, $response));
+        $kernel->execute();
+    } catch (Throwable | Swoole\ExitException $th) {
+         echo $th, PHP_EOL;
+
+        if ($response) {
+            $response->status(500);
+        }
+    }
+
+    unset($kernel, $request, $response);
+});
+
+$http->set([
+    'daemonize' => $daemon,
+    'worker_num' => $worker,
+    'log_file' => $log,
+]);
+
+unset($version, $load, $cfg, $env, $addr, $port, $log, $daemon, $worker);
+
+$http->start();

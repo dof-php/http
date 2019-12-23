@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\__DOMAIN__\HTTP\Port__VERSION_NS____NAMESPACE__;
+
+use DOF\HTTP\HTTPPort;
+// use DOF\HTTP\Pipe\Paginate;
+// use DOF\HTTP\Pipe\Sorting;
+// use DOF\Util\Wrapper\Pagination;
+// use Domain\__DOMAIN__\Service\__NAME__ as Service;
+
+/**
+ * @Author(name@group.com)
+ * @Version(__VERSION__)
+ * @Auth(0)
+ * @Title(Port Title)
+ * @_SubTitle(Port SubTitle)
+ * @Status(0)
+ * @Route(__ROUTE__)
+ * @Verb(GET)
+ * @Autonomy(1)
+ * @MimeOut(json)
+ * @Suffix(json)
+ * @_Model(Domain\__DOMAIN__\Entity\__NAME__)
+ * @_Assembler(Domain\__DOMAIN__\Assembler\__NAME__)
+ * @_PipeIn()
+ * @_WrapOut()
+ * @_Group(__NAME__)
+ * @_NotRoute(1)
+ * @_NoDump(1)
+ * @_NoDoc(1)
+ * @_Logging(Domain\Logging\Repository\__NAME__LogRepository)
+ * @_InfoOK(Success)
+ * @_LogMaskKey()
+ * @_CodeOK(200)
+ */
+class __NAME__ extends HTTPPort
+{
+    /**
+     * @Title(Parameter Title)
+     * @Type(String)
+     * @Need(1)
+     * @_Compatible()
+     */
+    protected $param1;
+
+    // public function execute(Service $service)
+    public function execute()
+    {
+        // $this->route()->err(Err::_, 404);
+        // $this->route()->arguments;
+
+        return $service
+            ->setParam1($this->param1)
+            ->execute();
+    }
+}

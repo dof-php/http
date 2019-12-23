@@ -1,0 +1,166 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\__DOMAIN__\HTTP\Port__VERSION_NS____NAMESPACE__;
+
+use DOF\HTTP\HTTPPort;
+use DOF\HTTP\Pipe\Paginate;
+use DOF\HTTP\Pipe\Sorting;
+// use Domain\__DOMAIN__\Err;
+use Domain\__DOMAIN__\Service\CRUD\Create__NAME__;
+use Domain\__DOMAIN__\Service\CRUD\Delete__NAME__;
+use Domain\__DOMAIN__\Service\CRUD\Update__NAME__;
+use Domain\__DOMAIN__\Service\CRUD\Show__NAME__;
+use Domain\__DOMAIN__\Service\CRUD\List__NAME__;
+
+/**
+ * @Author(name@group.com)
+ * @Version(__VERSION__)
+ * @Auth(0)
+ * @_Group(__DOMAIN__/__NAME__)
+ * @Route(__ROUTE__)
+ * @Model(Domain\__DOMAIN__\Entity\__NAME__)
+ * @Assembler(Domain\__DOMAIN__\Assembler\__NAME__)
+ * @MimeOut(json)
+ * @Suffix(json)
+ * @Autonomy(0)
+ * @_PipeIn()
+ */
+class __NAME__ extends HTTPPort
+{
+    /**
+     * @Title(__NAME__ ID)
+     * @Type(Pint)
+     * @_Compatible()
+     */
+    protected $id;
+
+    /**
+     * @Title(Parameter Title)
+     * @Type(String)
+     */
+    protected $param1;
+
+    /**
+     * @Title(__SEARCH_KEYWORD__)
+     * @Type(String)
+     * @Compatible(keyword)
+     */
+    protected $search;
+
+    /**
+     * @Title(__CRUD_CREATE__)
+     * @_SubTitle(Create Resource of __NAME__)
+     * @Route(/)
+     * @Verb(POST)
+     * @_NotRoute(1)
+     * @_NoDump(1)
+     * @_NoDoc(1)
+     * @Argument(param1)
+     * @_HeaderStatus(201){Created Success}
+     * @_Logging(Domain\__DOMAIN__\Repository\Create__NAME__LogRepository)
+     * @_LogMaskKey()
+     * @_InfoOK(Success)
+     * @_CodeOK(201)
+     */
+    public function create(Create__NAME__ $service)
+    {
+        // $this->route()->err(Err::_, 400);
+
+        return $service
+            ->setParam1($this->param1)
+            ->execute();
+    }
+
+    /**
+     * @Title(__CRUD_DELETE__)
+     * @Route({id})
+     * @Verb(DELETE)
+     * @_NotRoute(1)
+     * @_NoDump(1)
+     * @_NoDoc(1)
+     * @Argument(id){location=route}
+     * @Assembler(_)
+     * @Model(_)
+     * @_HeaderStatus(204){Deleted Success}
+     * @_Logging(Domain\__DOMAIN__\Repository\Delete__NAME__LogRepository)
+     * @_InfoOK(Success)
+     * @_CodeOK(204)
+     */
+    public function delete(int $id, Delete__NAME__ $service)
+    {
+        // $this->route()->err(Err::__NAME_UPPER___NOT_FOUND, 404);
+
+        $service->setId($id)->execute();
+
+        // $this->response()->setStatus(204);
+    }
+
+    /**
+     * @_NotRoute(1)
+     * @Title(__CRUD_UPDATE__)
+     * @Route({id})
+     * @Verb(PUT)
+     * @_NotRoute(1)
+     * @_NoDump(1)
+     * @_NoDoc(1)
+     * @Argument(id){location=route}
+     * @Argument(param1){need:0}
+     * @_Logging(Domain\__DOMAIN__\Repository\Update__NAME__LogRepository)
+     * @_LogMaskKey()
+     */
+    public function update(int $id, Update__NAME__ $service)
+    {
+        // $this->route()->err(Err::__NAME_UPPER___NOT_FOUND, 404);
+        // $this->route()->err(Err::NOTHING_TO_UPDATE, 202);
+
+        return $service
+            ->setId($id)
+            ->setParam1($this->param1)
+            ->execute();
+    }
+
+    /**
+     * @Title(__CRUD_SHOW__)
+     * @Route({id})
+     * @Verb(GET)
+     * @_NotRoute(1)
+     * @_NoDump(1)
+     * @_NoDoc(1)
+     * @Argument(id){location=route}
+     * @_Logging(Domain\__DOMAIN__\Repository\Show__NAME__LogRepository)
+     */
+    public function show(int $id, Show__NAME__ $service)
+    {
+        return $service->setId($id)->execute();
+    }
+
+    /**
+     * @Title(__CRUD_LIST__)
+     * @Route(/)
+     * @Verb(GET)
+     * @_NotRoute(1)
+     * @_NoDump(1)
+     * @_NoDoc(1)
+     * @PipeIn(Paginate)
+     * @PipeIn(Sorting){fields:id,createdAt,updatedAt}
+     * @Argument(search){need:0}
+     * @WrapOut(DOF\Util\Wrapper\Pagination)
+     * @_Logging(Domain\__DOMAIN__\Repository\List__NAME__LogRepository)
+     * @_MaxPageSize(200)
+     */
+    public function list(List__NAME__ $service)
+    {
+        $paginate = $this->route()->getPipein(Paginate::class);
+        $sorting  = $this->route()->getPipein(Sorting::class);
+
+        return $service
+            ->setPage($paginate->page)
+            ->setSize($paginate->size)
+            ->setSortField($sorting->field)
+            ->setSortOrder($sorting->order)
+            ->setFilter($this->route()->arguments())
+            ->execute();
+    }
+}

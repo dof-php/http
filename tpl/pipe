@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\__DOMAIN__\HTTP\Pipe__NAMESPACE__;
+
+// use Domain\__DOMAIN__\Err;
+// use Domain\__DOMAIN__\Service\__NAME__Service;
+
+class __NAME__
+{
+    // private $service;
+
+    // public function __construct(SupplierAuthService $service)
+    // {
+    //     $this->service = $service;
+    // }
+
+    public function pipein($request, $response, $route, $port)
+    {
+        // TODO
+    }
+
+    public function pipeout($result, $route, $port, $request, $response)
+    {
+        // TODO
+    }
+}
