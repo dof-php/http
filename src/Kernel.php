@@ -7,6 +7,7 @@ namespace DOF\HTTP;
 use Throwable;
 use DOF\ENV;
 use DOF\INI;
+use DOF\DOF;
 use DOF\Convention;
 use DOF\KernelInitializer;
 use DOF\Util\F;
@@ -335,6 +336,12 @@ class Kernel extends KernelInitializer
         if (! $route) {
             return $this->response->abort(404, 'ROUTE_NOT_FOUND', \compact('verb', 'path'));
         }
+
+        if (\is_file($lock = DOF::path(Convention::FLAG_HTTP_HALT))) {
+            list($since, $message) = JSON::decode($lock, true, true);
+            return $this->response->abort(503, $message, \compact('since'));
+        }
+
         if (! $port) {
             throw new HTTPKernelExceptor('ROUTE_WITHOUT_PORT', \compact('verb', 'path', 'route'));
         }

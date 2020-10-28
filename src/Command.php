@@ -393,47 +393,47 @@ class Command
     }
 
     /**
-     * @CMD(start)
-     * @Desc(Start/Restart web application)
+     * @CMD(service.start)
+     * @Desc(Start/Restart HTTP service)
      */
     public function startWeb($console)
     {
-        $lock = DOF::path(Convention::FLAG_HTTP_HALT);
-        if (!\is_file($lock)) {
-            return $console->success('OK! DOF http port is opened.');
+        if (! \is_file($lock = DOF::path(Convention::FLAG_HTTP_HALT))) {
+            return $console->ok('DOF HTTP web service is running.');
         }
 
         if (FS::unlink($lock) === false) {
-            return $console->fail('Failed!');
+            return $console->fail('Write permission denied.');
         }
 
-        return $console->success('Success!');
+        $console->ok('DOF HTTP web service restarted successfully.');
     }
 
     /**
-     * @CMD(stop)
-     * @Desc(Stop/Halt web application)
+     * @CMD(service.stop)
+     * @Desc(Stop/Halt HTTP service)
      * @Option(force){notes=Whether force stop web application even if it's stopped already}
      * @Option(message){notes=The application shutdown message text displays to visitors}
      */
     public function stopWeb($console)
     {
-        $lock = DOF::path(Convention::FLAG_HTTP_HALT);
-        if (\is_file($lock)) {
-            if ($console->hasOption('force') && (false === FS::unlink($lock))) {
-                return $console->fail('ERROR! Force shutdown failed.');
+        if (\is_file($lock = DOF::path(Convention::FLAG_HTTP_HALT))) {
+            if ($console->hasOption('force')) {
+                if (false === FS::unlink($lock)) {
+                    return $console->error('Write permission denied (1).');
+                }
+            } else {
+                return $console->ok('DOF HTTP service closed already.');
             }
-
-            return $console->success('OK! DOF http port was closed already.');
         }
 
         if (false === \file_put_contents($lock, JSON::encode([
-            'message' => $console->getOption('message', 'UNKNOWN'),
-            'since' => Format::microtime('T Y-m-d H:i:s'),
+            Format::microtime('T Y-m-d H:i:s'),
+            $console->getOption('message', 'Service Updating ...'),
         ]))) {
-            return $console->fail('Failed!');
+            return $console->error('Write permission denied (2).');
         }
 
-        return $console->success('Success!');
+        return $console->ok('DOF HTTP web service stoped.');
     }
 }
