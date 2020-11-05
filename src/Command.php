@@ -116,7 +116,7 @@ class Command
         }
 
         $name = \str_replace('\\', FS::DS, Format::u2c($console->getOption('port', null, true), CASE_UPPER));
-        if (Str::end($name, '.php', true)) {
+        if (Str::end('.php', $name, true)) {
             $name = Str::shift($name, 4, true);
         }
         $version = \ucfirst($console->getOption('version', 'V1'));
@@ -179,7 +179,7 @@ class Command
         }
 
         $name = \str_replace('\\', FS::DS, Format::u2c($console->getOption('wrapin', null, true), CASE_UPPER));
-        if (Str::end($name, '.php', true)) {
+        if (Str::end('.php', $name, true)) {
             $name = Str::shift($name, 4, true);
         }
         $pathof = DOF::pathof($class = FS::path($path, Convention::DIR_HTTP, Convention::DIR_WRAPIN, "{$name}.php"));
@@ -216,7 +216,7 @@ class Command
         }
 
         $name = \str_replace('\\', FS::DS, Format::u2c($console->getOption('pipe', null, true), CASE_UPPER));
-        if (Str::end($name, '.php', true)) {
+        if (Str::end('.php', $name, true)) {
             $name = Str::shift($name, 4, true);
         }
         $pathof = DOF::pathof($class = FS::path($path, Convention::DIR_HTTP, Convention::DIR_PIPE, "{$name}.php"));
